@@ -3,20 +3,36 @@ package main
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"io"
 	"net/http"
+	"os/exec"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
+	"github.com/robfig/cron/v3"
 )
 
 type Request struct {
-	URL     string
-	Headers map[string]string
-	Body    map[string]string
+	URL     string            `json:"url"`
+	Headers map[string]string `json:"headers"`
+	Body    interface{}       `json:"body"`
 }
 
 func main() {
+
+	go func() {
+		c := cron.New()
+		c.AddFunc("@every 15m", func() {
+			cmd := exec.Command("sudo", "systemctl", "restart", "ipsec")
+			err := cmd.Run()
+			if err != nil {
+				fmt.Println(err)
+			}
+		})
+		c.Start()
+		select {}
+	}()
 
 	app := fiber.New()
 	app.Use(cors.New())
