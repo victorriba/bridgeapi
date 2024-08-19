@@ -62,6 +62,7 @@ func main() {
 		client := &http.Client{}
 		resp, err := client.Do(httpReq)
 		if err != nil {
+			fmt.Println(err)
 			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Request failed"})
 		}
 		defer resp.Body.Close()
